@@ -13,7 +13,7 @@ namespace AmberScience.MotionPlanning {
         // Plan for CS paths for which only the start configuration is provided and the end point is only a postion without the heading.
         public static Journey Plan(MovementConfiguration start, Vector2 end, MovementConstraints constraints) {
             // Get turning bases for both turn directions from the start configuration.
-            var (startLeftTurningBase, startRightTurningBase) = GeometryQueries.CircleFromCircumferencePointTangentAndRadious(start.Position, start.Heading, constraints.TurningRadious);
+            var (startLeftTurningBase, startRightTurningBase) = GeometryQueries.CircleFromCircumferencePointTangentAndRadius(start.Position, start.Heading, constraints.TurningRadius);
 
             // For both turning bases calculate the distance for the journey to the end point.
             var leftTurningBaseJourney = CalculateCSPath(start, end, startLeftTurningBase);
@@ -33,7 +33,7 @@ namespace AmberScience.MotionPlanning {
             // The vectrors from center to end, from center to tangent point and from tangent point to end form a right triangle.
             // The angle between the vector from center to end and from center to tangent point is 90 degrees.
             // The angle alpha angle between the vectors from center to end and center to tangent is arc cosine of the ratio of the length of the two vectors.
-            var alpha = Mathf.Acos(startTurningBase.Radious / fromTurningBaseToEnd.magnitude);
+            var alpha = Mathf.Acos(startTurningBase.Radius / fromTurningBaseToEnd.magnitude);
 
             // Calculate unit circle angle for the tangent point by getting the angle of the vector from center to end and rotating it by alpha against the rotation direction.
             var centerToEndAngle = UnitCircle.VectorToAngle(fromTurningBaseToEnd);
@@ -48,7 +48,7 @@ namespace AmberScience.MotionPlanning {
             );
 
             // Calculate the tangent point.
-            var tangentPoint = UnitCircle.AngleToVector(tangentPointAngle) * startTurningBase.Radious + startTurningBase.Center;
+            var tangentPoint = UnitCircle.AngleToVector(tangentPointAngle) * startTurningBase.Radius + startTurningBase.Center;
 
             // Create straight from the tangent to the end point.
             var straight = new Straight(tangentPoint, end);
@@ -63,8 +63,8 @@ namespace AmberScience.MotionPlanning {
         // Plan for CSC and CCC paths for which both end and start movement configurations are allowed.
         public static Journey Plan(MovementConfiguration start, MovementConfiguration end, MovementConstraints constraints) {
             // Compute all turning base combinations.
-            var (startLeftTurningBase, startRightTurningBase) = GeometryQueries.CircleFromCircumferencePointTangentAndRadious(start.Position, start.Heading, constraints.TurningRadious);
-            var (endLeftTurningBase, endRightTurningBase) = GeometryQueries.CircleFromCircumferencePointTangentAndRadious(end.Position, end.Heading, constraints.TurningRadious);
+            var (startLeftTurningBase, startRightTurningBase) = GeometryQueries.CircleFromCircumferencePointTangentAndRadius(start.Position, start.Heading, constraints.TurningRadius);
+            var (endLeftTurningBase, endRightTurningBase) = GeometryQueries.CircleFromCircumferencePointTangentAndRadius(end.Position, end.Heading, constraints.TurningRadius);
 
             // Calculate correct path option based on travel direction of start and end configuration on their respective turning bases.
             var dubinsCSCCurves = new List<Journey>() {
@@ -99,7 +99,7 @@ namespace AmberScience.MotionPlanning {
             var fromStartToEnd = end.Position - start.Position;
 
             // If the distance between start and end is more than 4 x turning base radius then the CCC path can not be shortest and can skip.
-            if (fromStartToEnd.magnitude > 4 * startTurningBase.Radious) {
+            if (fromStartToEnd.magnitude > 4 * startTurningBase.Radius) {
                 return null;
             }
 
@@ -115,11 +115,11 @@ namespace AmberScience.MotionPlanning {
             // Calculate the center of the middle circle in the CCC path and create the middle circle.
             var fromStartTurningBaseCenterToEndTurningBaseCenter = endTurningBase.Center - startTurningBase.Center;
 
-            var angleBetweenStartToEndAndStartToMiddleCircle = Mathf.Acos((0.5f * fromStartTurningBaseCenterToEndTurningBaseCenter.magnitude) / (2 * startTurningBase.Radious));
-            var fromStartToCenterOfMiddleCircle = 2 * startTurningBase.Radious * VectorTransformations.RotateVector(fromStartTurningBaseCenterToEndTurningBaseCenter.normalized, angleBetweenStartToEndAndStartToMiddleCircle);
+            var angleBetweenStartToEndAndStartToMiddleCircle = Mathf.Acos((0.5f * fromStartTurningBaseCenterToEndTurningBaseCenter.magnitude) / (2 * startTurningBase.Radius));
+            var fromStartToCenterOfMiddleCircle = 2 * startTurningBase.Radius * VectorTransformations.RotateVector(fromStartTurningBaseCenterToEndTurningBaseCenter.normalized, angleBetweenStartToEndAndStartToMiddleCircle);
             var centerOfThirdCircle = startTurningBase.Center + fromStartToCenterOfMiddleCircle;
 
-            var middleCircle = new Circle(startTurningBase.Radious, centerOfThirdCircle);
+            var middleCircle = new Circle(startTurningBase.Radius, centerOfThirdCircle);
 
             // Calculate intersections between the three circles.
             var startToMiddleCrossPoint = startTurningBase.Center + 0.5f * (middleCircle.Center - startTurningBase.Center);
@@ -211,8 +211,8 @@ namespace AmberScience.MotionPlanning {
         }
 
         private static ITrajectory CalculateStraightTrajectoryBetweenTurningBases(Circle startTurningBase, Circle endTurningBase, UnitCircle.RotationDirection initialRotationDirection) {
-            Vector2 turningBaseToTurningBase = endTurningBase.Center - startTurningBase.Center;
-            Vector2 fromCenterToIntersection = startTurningBase.Radious * -1.0f * ((int)initialRotationDirection) * Vector2.Perpendicular(turningBaseToTurningBase).normalized;
+            var turningBaseToTurningBase = endTurningBase.Center - startTurningBase.Center;
+            var fromCenterToIntersection = startTurningBase.Radius * -1.0f * ((int)initialRotationDirection) * Vector2.Perpendicular(turningBaseToTurningBase).normalized;
             return new Straight(
                 startTurningBase.Center + fromCenterToIntersection,
                 endTurningBase.Center + fromCenterToIntersection
@@ -220,21 +220,21 @@ namespace AmberScience.MotionPlanning {
         }
 
         private static ITrajectory CalculateCrossTrajectoryBetweenTurningBases(Circle startTurningBase, Circle endTurningBase, UnitCircle.RotationDirection initialRotationDirection) {
-            Vector2 turningBaseToTurningBase = endTurningBase.Center - startTurningBase.Center;
-            Vector2 fromStartToMidpoint = 0.5f * turningBaseToTurningBase;
-            Vector2 fromEndToMidpoint = -0.5f * turningBaseToTurningBase;
+            var turningBaseToTurningBase = endTurningBase.Center - startTurningBase.Center;
+            var fromStartToMidpoint = 0.5f * turningBaseToTurningBase;
+            var fromEndToMidpoint = -0.5f * turningBaseToTurningBase;
 
-            var cosine = startTurningBase.Radious / fromStartToMidpoint.magnitude;
+            var cosine = startTurningBase.Radius / fromStartToMidpoint.magnitude;
 
             // Cosine should always be between -1 and 1. If it is not then return null to indicate that trajectory is not valid.
             if (cosine > 1.0f || cosine < -1.0f) {
                 return null;
             }
 
-            float alpha = Mathf.Acos(cosine);
+            var alpha = Mathf.Acos(cosine);
             return new Straight(
-                startTurningBase.Center + startTurningBase.Radious * VectorTransformations.RotateVector(fromStartToMidpoint.normalized, -1.0f * ((int)initialRotationDirection) * alpha),
-                endTurningBase.Center + endTurningBase.Radious * VectorTransformations.RotateVector(fromEndToMidpoint.normalized, -1.0f * ((int)initialRotationDirection) * alpha)
+                startTurningBase.Center + startTurningBase.Radius * VectorTransformations.RotateVector(fromStartToMidpoint.normalized, -1.0f * ((int)initialRotationDirection) * alpha),
+                endTurningBase.Center + endTurningBase.Radius * VectorTransformations.RotateVector(fromEndToMidpoint.normalized, -1.0f * ((int)initialRotationDirection) * alpha)
             );
         }
     }

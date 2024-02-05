@@ -25,7 +25,7 @@ namespace AmberScience.MotionPlanning.Trajectories {
         }
 
         public MovementConfiguration GetMovementConfiguration(float travelDistance) {
-            Vector2 direction = (this.EndPosition - this.StartPosition).normalized;
+            var direction = (this.EndPosition - this.StartPosition).normalized;
             return new MovementConfiguration(
                 this.StartPosition + direction * Mathf.Min(travelDistance, this.Length),
                 direction

@@ -25,7 +25,7 @@ namespace AmberScience.MathBase.Trigonometry {
         }
 
         public static float AngleBetweenTwoAgles(float startAngleRad, float endAngleRad, RotationDirection directionOfRotation) {
-            bool needsToCrossZero = directionOfRotation == RotationDirection.Counterclockwise
+            var needsToCrossZero = directionOfRotation == RotationDirection.Counterclockwise
                 ? endAngleRad < startAngleRad
                 : endAngleRad > startAngleRad;
 
@@ -56,7 +56,7 @@ namespace AmberScience.MathBase.Trigonometry {
         }
 
         public static float NormalizeAngle(float angleRad) {
-            float singleRound = angleRad % FullCircle;
+            var singleRound = angleRad % FullCircle;
             return singleRound > 0.0f
                 ? singleRound
                 : FullCircle - Mathf.Abs(singleRound);

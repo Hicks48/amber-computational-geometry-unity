@@ -52,7 +52,7 @@ namespace AmberScience.MotionPlanning {
                 return null;
             }
 
-            SimpleJourney currentSimpleJourney = this.SimpleJourneys[this.currentJourneyIndex];
+            var currentSimpleJourney = this.SimpleJourneys[this.currentJourneyIndex];
 
             bool isOverCurrentJourney = currentSimpleJourney.GetRemainingDistance() < deltaDistance;
             if (!isOverCurrentJourney) {
@@ -70,7 +70,7 @@ namespace AmberScience.MotionPlanning {
         }
 
         public float GetRemainingDistance() {
-            float remainingDistance = 0.0f;
+            var remainingDistance = 0.0f;
             for (int i = this.currentJourneyIndex; i < this.SimpleJourneys.Count; i++) {
                 remainingDistance += this.SimpleJourneys[i].GetRemainingDistance();
             }

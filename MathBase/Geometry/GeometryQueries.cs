@@ -6,15 +6,15 @@ namespace AmberScience.MathBase.Geometry {
 
     public static class GeometryQueries {
 
-        public static (Circle, Circle) CircleFromCircumferencePointTangentAndRadious(Vector2 circumferencePoint, Vector2 tangent, float radious) {
-            Vector2 fromTangentToCircleCenter = Vector2.Perpendicular(tangent).normalized * radious;
+        public static (Circle, Circle) CircleFromCircumferencePointTangentAndRadius(Vector2 circumferencePoint, Vector2 tangent, float radius) {
+            var fromTangentToCircleCenter = Vector2.Perpendicular(tangent).normalized * radius;
 
-            Vector2 circleACenter = circumferencePoint + fromTangentToCircleCenter;
-            Vector2 circleBCenter = circumferencePoint - fromTangentToCircleCenter;
+            var circleACenter = circumferencePoint + fromTangentToCircleCenter;
+            var circleBCenter = circumferencePoint - fromTangentToCircleCenter;
 
             return VectorLocationQueries.IsLeftOf(tangent, circleACenter)
-                ? (new Circle(radious, circleACenter), new Circle(radious, circleBCenter))
-                : (new Circle(radious, circleBCenter), new Circle(radious, circleACenter));
+                ? (new Circle(radius, circleACenter), new Circle(radius, circleBCenter))
+                : (new Circle(radius, circleBCenter), new Circle(radius, circleACenter));
         }
 
         public static UnitCircle.RotationDirection GetRotationDirection(Vector2 tangent, Vector2 circumferencePoint, Vector2 circleCenter) {

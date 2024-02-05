@@ -1,10 +1,10 @@
 namespace AmberScience.MotionPlanning {
     
     public class MovementConstraints {
-        public float TurningRadious { get; private set; }
+        public float TurningRadius { get; private set; }
 
-        public MovementConstraints(float turningRadious) {
-            this.TurningRadious = turningRadious;
+        public MovementConstraints(float turningRadius) {
+            this.TurningRadius = turningRadius;
         }
     }
 }

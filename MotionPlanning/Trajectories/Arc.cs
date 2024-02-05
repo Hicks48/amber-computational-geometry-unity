@@ -12,7 +12,7 @@ namespace AmberScience.MotionPlanning.Trajectories {
         }
 
         public float Length {
-            get { return this.AngleLengthRad * this.TurningBase.Radious; }
+            get { return this.AngleLengthRad * this.TurningBase.Radius; }
         }
 
         public Circle TurningBase { get; }
@@ -32,11 +32,11 @@ namespace AmberScience.MotionPlanning.Trajectories {
         public UnitCircle.RotationDirection DirectionOfRotation { get; }
 
         public Vector2 StartPosition {
-            get { return this.TurningBase.Center + this.TurningBase.Radious * UnitCircle.CircumferencePointForAngle(this.StartAngleRad); }
+            get { return this.TurningBase.Center + this.TurningBase.Radius * UnitCircle.CircumferencePointForAngle(this.StartAngleRad); }
         }
 
         public Vector2 EndPosition {
-            get { return this.TurningBase.Center + this.TurningBase.Radious * UnitCircle.CircumferencePointForAngle(this.EndAngleRad); }
+            get { return this.TurningBase.Center + this.TurningBase.Radius * UnitCircle.CircumferencePointForAngle(this.EndAngleRad); }
         }
 
         public Arc(Circle turningBase, float startAngleRad, float endAngleRad, UnitCircle.RotationDirection directionOfRotation) {
@@ -47,10 +47,10 @@ namespace AmberScience.MotionPlanning.Trajectories {
         }
 
         public MovementConfiguration GetMovementConfiguration(float travelDistance) {
-            float newAngle = this.StartAngleRad + ((int) this.DirectionOfRotation) * this.TurningBase.GetDeltaAngleRad(travelDistance);
+            var newAngle = this.StartAngleRad + ((int) this.DirectionOfRotation) * this.TurningBase.GetDeltaAngleRad(travelDistance);
 
-            Vector2 newPosition = this.TurningBase.GetCircumferencePoint(newAngle);
-            Vector2 newHeading = ((int) this.DirectionOfRotation) * Vector2.Perpendicular(newPosition - this.TurningBase.Center);
+            var newPosition = this.TurningBase.GetCircumferencePoint(newAngle);
+            var newHeading = ((int) this.DirectionOfRotation) * Vector2.Perpendicular(newPosition - this.TurningBase.Center);
 
             return new MovementConfiguration(newPosition, newHeading);
         }
